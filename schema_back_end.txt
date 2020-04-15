@@ -1,0 +1,55 @@
+OBJECT CONTRACT
+//ID - integer
+//MACHINE_ID - integer
+//CUSTOMER_ID - integer
+//FIRST_DAY - date
+//LAST_DAY - date
+//ESTIMATE - boolean
+//DAY_PRICE - float
+//DAY_NUMBER - float
+//HOUR_PRICE - float
+//HOUR_NUMBER - float
+
+
+OBJECT MACHINE
+//ID - integer
+//NATURE - varchar
+//BRAND - varchar
+//TYPE - varchar
+//OPTIONS - varchar
+//HORSEPOWER - integer
+//DAY_PRICE - float
+//HOUR_PRICE - float
+
+
+OBJECT CUSTOMER
+//ID - integer
+//CUSTOMER_COMPANY_NAME - varchar
+//CUSTOMER_MANAGER - varchar
+//CUSTOMER_ADDRESS - varchar
+//CUSTOMER_POSTAL_CODE- varchar
+//CUSTOMER_CITY - varchar
+//CUSTOMER_CELLPHONE - varchar
+//CUSTOMER_PHONE - varchar
+//CUSTOMER_EMAIL - varchar
+
+OBJECT DEALER
+//DEALER_ID
+//DEALER_NAME
+//DEALER_MANAGER - varchar
+//DEALER_ADDRESS - varchar
+//DEALER_POSTAL_CODE- varchar
+//DEALER_CITY - varchar
+//DEALER_CELLPHONE - varchar
+//DEALER_PHONE - varchar
+//DEALER_EMAIL - varchar
+//DEALER_LOGO - varchar
+//DEALER_HEADER - varchar
+//DEALER_COLOR - varchar
+
+OBJECT USER
+//USER_NAME
+//USER_EMAIL
+//USER_PHONE
+//USER_PASSWORD
+//DEALER_ID

@@ -8,6 +8,7 @@ import IconButton from '@material-ui/core/IconButton';
 import InfoIcon from '@material-ui/icons/Info';
 import DateRangeIcon from '@material-ui/icons/DateRange';
 import DescriptionIcon from '@material-ui/icons/Description';
+import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -49,8 +50,11 @@ export default function Machinegridlist({handleMachineAction,machine_catalog}) {
                   <IconButton aria-label={`Informations sur ${machine.type.toUpperCase()}`} className={classes.icon}  onClick={()=>handleMachineAction(machine,'calendar')}>
                     <DateRangeIcon/>
                   </IconButton>
-                  <IconButton aria-label={`Informations sur ${machine.type.toUpperCase()}`} className={classes.icon}  onClick={()=>handleMachineAction(machine,'booking')}>
+                  <IconButton aria-label={`Informations sur ${machine.type.toUpperCase()}`} className={classes.icon}  onClick={()=>handleMachineAction(machine,'calendar')}>
                     <DescriptionIcon/>
+                  </IconButton>
+                  <IconButton aria-label={`Informations sur ${machine.type.toUpperCase()}`} className={classes.icon}  onClick={()=>handleMachineAction(machine,'booking')}>
+                    <AddCircleOutlineIcon/>
                   </IconButton>
                 </div>
               }

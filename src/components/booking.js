@@ -27,6 +27,7 @@ import { DateRangePicker } from 'react-dates';
 import 'react-dates/initialize';
 import 'react-dates/lib/css/_datepicker.css';
 import moment from 'moment';
+import Axios from 'axios';
 
 const useStyles = makeStyles((theme) => ({
   rootStep: {
@@ -118,7 +119,7 @@ export default function Booking({machine,dealer,setContractToState,allBookingDat
     setValues({ ...values, [prop]: event.target.value });
   };
 
-  const handleNext = () => {
+  const handleNext = async() => {
 
     if(activeStep===0){
       if(firstSelectedDate&&lastSelectedDate){
@@ -141,11 +142,13 @@ export default function Booking({machine,dealer,setContractToState,allBookingDat
 
         /**CHEKING IF NO ELEMENT IN NEWDATESTOADD IS ALREADY BOOKED*/
         const dateUnauthorized = []
-        newDatesToAdd.map((element)=>{
-          if(allBookingDates.includes(element)){
-            dateUnauthorized.push(element);
+        newDatesToAdd.map(
+          (element)=>{
+            if(allBookingDates.includes(element)){
+              dateUnauthorized.push(element);
+            }
           }
-        });
+        );
 
         if(dateUnauthorized.length>0){
           setAlertSnackbarMessage('Certaines dates sélectionnées sont déjà réservées');
@@ -170,8 +173,29 @@ export default function Booking({machine,dealer,setContractToState,allBookingDat
         setAlertSnackbarOpen(true);
       }
     }else if(activeStep===2){
-      setContractToState(tempBookingDates,customerOnContract,unitChoice,bookingType);
+      const bookingFormatedToJson = customerOnContract;
+      bookingFormatedToJson.bookingDates=tempBookingDates;
+      bookingFormatedToJson.status=bookingType;
+      bookingFormatedToJson.id=machine.id;
+      setContractToState(bookingFormatedToJson);
+
+      try{
+        const axiosResponse = await Axios({
+          method: "post",
+          url: 'http://localhost:4001/post/addBooking',
+          data:bookingFormatedToJson, //DATA PARAMETER = req.body IF JSON || form-data IF FORM
+        });
+        console.log('axios response : ',axiosResponse);
+      }
+      catch(error){
+        console.log('error: ',error);
+      }
+      
+
+      
     }
+
+    
 
     };
 

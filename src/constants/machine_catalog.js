@@ -8,7 +8,6 @@ const machine_catalog=[
         horspower:150,
         day_price:180,
         hour_price:18,
-        blockedDates:['2020-3-15', '2020-3-18'],
         image_url:'https://inspekt-prod.s3.eu-west-3.amazonaws.com/INSPEKT_OPEN_MEDIAS/DSCN6353.jpg'
     },
     {
@@ -20,7 +19,6 @@ const machine_catalog=[
         horsepower:170,
         day_price:210,
         hour_price:21,
-        blockedDates:[],
         image_url:'https://inspekt-prod.s3.eu-west-3.amazonaws.com/INSPEKT_OPEN_MEDIAS/XdwHu4jrPE-ErLm6uGPbMA_1.jpg'
     },
     {
@@ -34,7 +32,6 @@ const machine_catalog=[
         hour_price:18,
         booking:[
             {
-                id:'1',
                 customer_name:'GAEC DURAND',
                 customer_address:'4 route des lilas',
                 customer_postal:'21000',
@@ -43,13 +40,12 @@ const machine_catalog=[
                 customer_cellphone:'06 78 95 46 51',
                 customer_email:'gaecdurand@wanadoo.fr',
                 booking_dates:['2020-4-21','2020-4-22','2020-4-23','2020-4-24','2020-4-25','2020-4-26'],
-                status:'contract',
+                status:'estimate',
                 unit:'day',
                 price_per_unit:'200',
                 unit_number:'5'
             },
             {
-                id:'2',
                 customer_name:'GAEC LANGLAIS',
                 customer_address:'le vieux chene',
                 customer_postal:'71000',
@@ -63,7 +59,6 @@ const machine_catalog=[
                 price_per_unit:'170',
                 unit_number:'3'
             },{
-                id:'3',
                 customer_name:'EART DES ARBRES',
                 customer_address:'Avenue des noisetiers',
                 customer_postal:'21200',

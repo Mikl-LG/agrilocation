@@ -62,60 +62,57 @@ const useStyles = makeStyles((theme) => ({
 export default function Addmachine({titleColor,dealerColor,dealerBackgroundColor}) {
   const classes = useStyles();
   const [machine, setMachine] = React.useState({});
+
   const handleChange = (event,propertyName) => {
     setMachine({...machine,[propertyName]:event.target.value});
-  };
-  const createMachine = async()=>{
-
-    /**SECTION RESERVED TO THE IMAGE UPLOAD (need help) */
-    /*const machinePicture = await new Promise((resolve,reject)=>{
-      try{
-        let formdata = new FormData();
-        machine.image.forEach((value,index)=>{
-          console.log(index,value);
-          formdata.append('filedata',value);
-          if(index===machine.image.length-1){
-            resolve(formdata);
-          }
-        })
-      }catch(error){
-        console.log('error:',error)
-      }
-    })*/
-
-    const machineInformations = await new Promise((resolve,reject)=>{
-      try{
-        console.log('machine : ',machine);
-        let machineForm = new FormData();
-        //await Promise.resolve(machineForm.append('brand',machine.brand));
-        //await Promise.resolve(machineForm.append('type',machine.type));
-        //await Promise.resolve(machineForm.append('nature',machine.nature));
-        machineForm.append('filedata',machine.image);
-        resolve(machineForm);
-      }catch(error){
-        reject(error);
-      }
-    })
-
-    console.log('machineInformations : ',machineInformations);
-    
-    const axiosResponse = await Axios({
-      method: "post",
-      url: 'http://localhost:4001/post/addMachineImage',
-      data:machineInformations,
-      config: { headers: { "Content-Type": "multipart/form-data" } }
-    });
-
-    console.log('axiosResponse : ',axiosResponse);
-
-    /*const imageurl = await Promise.resolve(
-      axiosResponse.status===200
-      ?axiosResponse.data.map(element=>element.location)
-      :[]
-    );
-            
-    console.log('axiosResponse : ',imageurl);*/
   }
+
+  const createMachine = async() => {
+    try {
+  
+      const machineInformations = await new Promise(async(resolve,reject)=>{
+        try{
+          const image = machine.image && machine.image[0]
+          // console.log('machine : ',machine);
+          let machineForm = new FormData();
+          
+          machineForm.append('filedata',image);
+          machineForm.append('brand',machine.brand);
+          machineForm.append('type',machine.type);
+          machineForm.append('nature',machine.nature);
+          
+          resolve(machineForm);
+        }catch(error){
+          console.log('machineInformations error', error)
+          reject(error);
+        }
+      })
+
+      const axiosResponse = await Axios({
+        method: "post",
+        url: 'http://localhost:4001/post/addMachineImage',
+        data:machineInformations,
+        config: { headers: { "Content-Type": "multipart/form-data" } }
+      });
+
+      const {data, status} = axiosResponse
+      const img = (data && data.length && data[0]) || {}
+      const {location} = img
+
+      const imageurl = await Promise.resolve(
+        status === 200
+        ? location
+        : ""
+      );
+              
+      console.log('s3 uploaded image url : ', imageurl || 'no url received');
+
+    } catch(e) {
+      console.log('addMachine error', e || 'null')
+    }
+  }
+
+  console.log('machine updated: ', machine)
 
   return (
     <div>

@@ -1,12 +1,16 @@
 import React from 'react';
 import 'typeface-roboto';
+import CloseIcon from '@material-ui/icons/Close';
 import {Grid} from '@material-ui/core';
+import IconButton from '@material-ui/core/IconButton';
 import { makeStyles } from '@material-ui/core/styles';
-import TextField from '@material-ui/core/TextField';
-import { Typography,Button } from '@material-ui/core';
+import { Typography,Button,TextField } from '@material-ui/core';
 import SaveIcon from '@material-ui/icons/Save';
-import Dropzone from 'react-dropzone';
+import Snackbar from '@material-ui/core/Snackbar';
 import PhotoCamera from '@material-ui/icons/PhotoCamera';
+
+import Dropzone from 'react-dropzone';
+
 import Axios from 'axios';
 
 const useStyles = makeStyles((theme) => ({
@@ -59,60 +63,80 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-export default function Addmachine({titleColor,dealerColor,dealerBackgroundColor}) {
+export default function Addmachine({titleColor,dealerColor,dealerBackgroundColor,returnHomeInformUser}) {
   const classes = useStyles();
   const [machine, setMachine] = React.useState({});
+  const [loading,setLoading] = React.useState(false);
+  const [alertSnackbarIsOpen,setAlertSnackbarIsOpen] = React.useState(false);
+  const [alertSnackbarMessage,setAlertSnackbarMessage] = React.useState('Une erreur vient de se produire');
 
   const handleChange = (event,propertyName) => {
     setMachine({...machine,[propertyName]:event.target.value});
   }
 
   const createMachine = async() => {
-    try {
-  
-      const machineInformations = await new Promise(async(resolve,reject)=>{
-        try{
-          const image = machine.image && machine.image[0]
-          // console.log('machine : ',machine);
-          let machineForm = new FormData();
-          
-          machineForm.append('filedata',image);
-          machineForm.append('brand',machine.brand);
-          machineForm.append('type',machine.type);
-          machineForm.append('nature',machine.nature);
-          
-          resolve(machineForm);
-        }catch(error){
-          console.log('machineInformations error', error)
-          reject(error);
-        }
-      })
 
-      const axiosResponse = await Axios({
-        method: "post",
-        url: 'http://localhost:4001/post/addMachineImage',
-        data:machineInformations,
-        config: { headers: { "Content-Type": "multipart/form-data" } }
-      });
+    /** CHECK IF ALL THE FIELDS ARE COMPLETE */
+    if(machine.brand === undefined || machine.brand === '' || machine.nature === undefined || machine.nature === '' ||machine.type === undefined || machine.type === '' || machine.day_price === undefined || machine.day_price === '' || machine.hour_price === undefined || machine.hour_price === ''){
 
-      const {data, status} = axiosResponse
-      const img = (data && data.length && data[0]) || {}
-      const {location} = img
+    setAlertSnackbarMessage('Encore un effort : il semble qu\'au moins un champ ne soit pas complété');
+    setAlertSnackbarIsOpen(true);
+    
+    }
+    else
+    {
+      /**SNACKBAR DURING THE LOADING OF THE PICTURE */
+      setLoading(true);
+      setAlertSnackbarMessage('Patience, votre machine est presque prête...');
+      setAlertSnackbarIsOpen(true);
+      
+      try {
+    
+        const machineInformations = await new Promise(async(resolve,reject)=>{
+          try{
+            const image = machine.image && machine.image[0]
+            let machineForm = new FormData();
+            
+            machineForm.append('filedata',image);
+            machineForm.append('brand',machine.brand);
+            machineForm.append('type',machine.type);
+            machineForm.append('nature',machine.nature);
+            machineForm.append('options',machine.options);
+            machineForm.append('day_price',machine.day_price);
+            machineForm.append('hour_price',machine.hour_price);
+            machineForm.append('booking',[]);
+            
+            resolve(machineForm);
 
-      const imageurl = await Promise.resolve(
-        status === 200
-        ? location
-        : ""
-      );
-              
-      console.log('s3 uploaded image url : ', imageurl || 'no url received');
+          }catch(error){
 
-    } catch(e) {
-      console.log('addMachine error', e || 'null')
+            reject(error);
+
+          }
+        })
+
+        const axiosResponse = await Axios({
+          method: "post",
+          url: 'http://localhost:4001/post/addMachineImage',
+          data:machineInformations,
+          config: { headers: { "Content-Type": "multipart/form-data" } }
+        });
+
+        const {data, status} = axiosResponse;
+                
+        //console.log('s3 uploaded image url : ', imageurl || 'no url received');
+        status === 201 && returnHomeInformUser('Votre machine est prête à être louée','success')
+      } catch(e) {
+
+        console.log('addMachine error', e || 'null')
+
+        /**ALLOW THE USER TO CORRECT HIS INFORMATIONS */
+        setAlertSnackbarMessage('Mince, quelque-chose s\'est mal passé: vérifiez les informations saisies et votre connexion.');
+        setAlertSnackbarIsOpen(true);
+        setLoading(false);
+      }
     }
   }
-
-  console.log('machine updated: ', machine)
 
   return (
     <div>
@@ -126,6 +150,7 @@ export default function Addmachine({titleColor,dealerColor,dealerBackgroundColor
         <Grid item xs={12} lg={4} className={classes.gridItem}>
           <TextField
                 className={classes.textfield}
+                disabled={loading}
                 id="outlined-name"
                 label="Nature"
                 placeholder='Tracteur, presse...'
@@ -135,6 +160,7 @@ export default function Addmachine({titleColor,dealerColor,dealerBackgroundColor
               />
               <TextField
                 className={classes.textfield}
+                disabled={loading}
                 id="outlined-name"
                 label="Marque"
                 placeholder='Marque'
@@ -144,6 +170,7 @@ export default function Addmachine({titleColor,dealerColor,dealerBackgroundColor
               />
               <TextField
                 className={classes.textfield}
+                disabled={loading}
                 id="outlined-name"
                 label="Modèle"
                 placeholder='Modèle'
@@ -155,6 +182,7 @@ export default function Addmachine({titleColor,dealerColor,dealerBackgroundColor
         <Grid item xs={12} lg={4} className={classes.gridItem}>
           <TextField
                 className={classes.textfield}
+                disabled={loading}
                 id="outlined-name"
                 label="Options"
                 placeholder='Relevage avant, chargeur, autoguidage...'
@@ -164,6 +192,7 @@ export default function Addmachine({titleColor,dealerColor,dealerBackgroundColor
               />
               <TextField
                 className={classes.textfield}
+                disabled={loading}
                 id="outlined-name"
                 label="Prix à l'heure"
                 placeholder='Tarif horaire de votre machine'
@@ -173,6 +202,7 @@ export default function Addmachine({titleColor,dealerColor,dealerBackgroundColor
               />
               <TextField
                 className={classes.textfield}
+                disabled={loading}
                 id="outlined-name"
                 label="Prix à la journée"
                 placeholder='Tarif journalier de votre machine'
@@ -182,7 +212,7 @@ export default function Addmachine({titleColor,dealerColor,dealerBackgroundColor
               />
         </Grid>
         <Grid item xs={12} lg={4} className={classes.gridItem} style={{alignSelf:'center'}}>
-          <Dropzone onDrop={acceptedFiles => setMachine({...machine,image:acceptedFiles})}>
+          <Dropzone disabled={loading} onDrop={acceptedFiles => setMachine({...machine,image:acceptedFiles})}>
             {({getRootProps, getInputProps}) => (
               <section>
                 <div className={classes.dropzone} {...getRootProps()}>
@@ -202,6 +232,7 @@ export default function Addmachine({titleColor,dealerColor,dealerBackgroundColor
           </Dropzone>
         
           <Button
+                disabled={loading}
                 variant="contained"
                 color="primary"
                 size="large"
@@ -215,6 +246,23 @@ export default function Addmachine({titleColor,dealerColor,dealerBackgroundColor
         </Grid>
       </form>
     </Grid>
+    <Snackbar
+      anchorOrigin={{
+        vertical: 'top',
+        horizontal: 'center',
+      }}
+      open={alertSnackbarIsOpen}
+      autoHideDuration={4000}
+      onClose={()=>setAlertSnackbarIsOpen(false)}
+      message={alertSnackbarMessage&&alertSnackbarMessage}
+      action={
+        <React.Fragment>
+          <IconButton size="small" aria-label="close" color="inherit" onClick={()=>setAlertSnackbarIsOpen(false)}>
+            <CloseIcon fontSize="small" />
+             </IconButton>
+        </React.Fragment>
+      }
+    />
       
       
     </div>

@@ -1,14 +1,17 @@
 import React,{Component} from 'react';
-import ButtonAppBar from './Appbar.js';
-import Machinegridlist from './components/machinegridlist.js';
+
+import Addbooking from './components/addbooking.js';
 import Addmachine from './components/addmachine.js';
-import Machine_catalog from './constants/machine_catalog.js';
+import Bookinglist from './components/bookinglist';
+import ButtonAppBar from './Appbar.js';
 import Customers_catalog from './constants/customers.js';
+import Machinegridlist from './components/machinegridlist.js';
+
+import CloseIcon from '@material-ui/icons/Close';
 import Dealer from './constants/dealer.js';
-import Booking from './components/booking.js';
-import { Container } from '@material-ui/core';
 import Icon from '@material-ui/core/Icon';
-import { Typography,Button } from '@material-ui/core';
+import { Container,Button,Typography } from '@material-ui/core';
+import Snackbar from '@material-ui/core/Snackbar';
 import IconButton from '@material-ui/core/IconButton';
 import Axios from 'axios';
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
@@ -21,7 +24,7 @@ import 'moment/locale/fr';
 class Mainview extends Component{
     constructor(props){
         super(props)
-        this.state={action:'home'}
+        this.state={action:'home',messageSnackbarIsOpen:false}
         
     }
 
@@ -43,10 +46,14 @@ class Mainview extends Component{
                 element=>element.status==='contract'
             ).forEach(
                 element => {
-                allBookingDates = [...allBookingDates,...element.booking_dates];
+                allBookingDates = [...allBookingDates,...element.bookingDates];
             });
         }
         this.setState({machine:machine,action:action,allBookingDates:allBookingDates})
+    }
+
+    returnHomeInformUser=(message)=>{
+        this.setState({messageSnackbarIsOpen:true,snackbarMessage:message,action:'home'});
     }
 
     setContractToState=(contract)=>{
@@ -100,11 +107,15 @@ class Mainview extends Component{
         
     }
 
-    async componentDidMount(){
-        await Promise.resolve(this.setState({Machine_catalog:Machine_catalog}));
-        await Promise.resolve(this.setState({dealer:Dealer[0]}));
-        await Promise.resolve(this.setState({Customers_catalog:Customers_catalog}));
-        
+    snackBarHandleClose = (event, reason) => {
+        if (reason === 'clickaway') {
+          return;
+        }
+    
+        this.setState({messageSnackbarIsOpen:false});
+      }
+
+    updateCatalogMachine=async()=>{
         try{
             const axiosResponse = await Axios({
               method: "get",
@@ -112,17 +123,24 @@ class Mainview extends Component{
             });
             
             const MACHINE_CATALOG = axiosResponse.data;
-            //console.log('machines : ',MACHINE_CATALOG.data);
+            this.setState({Machine_catalog:MACHINE_CATALOG.data});
             
-            }
-            catch(error){
-                console.log('error: ',error);
-            }
-        
+        }
+        catch(error){
+            console.log('error: ',error);
+        }
+      }
+
+    async componentDidMount(){
+        //await Promise.resolve(this.setState({Machine_catalog:Machine_catalog}));
+        await Promise.resolve(this.setState({dealer:Dealer[0]}));
+        await Promise.resolve(this.setState({Customers_catalog:Customers_catalog}));
+        await Promise.resolve(this.updateCatalogMachine());
         
     }
 
-    componentDidUpdate(){
+    async componentDidUpdate(){
+        
         console.log('state : ',this.state);
     }
 
@@ -153,22 +171,56 @@ class Mainview extends Component{
                         }
                         {
                             action==='booking'
-                            ?<Booking
+                            ?<Addbooking
                                 machine={machine}
                                 dealer={dealer}
                                 Customers_catalog={customersCatalog}
                                 setContractToState={this.setContractToState}
-                                allBookingDates={this.state.allBookingDates}/>
-                            :(action==='new_machine'
-                            ?<Addmachine 
-                            titleColor={titleColor}
-                            dealerColor={dealerColor}
-                            dealerBackgroundColor={dealerBackgroundColor}>
-
-                            </Addmachine>
-                            :<Machinegridlist handleMachineAction={this.handleMachineAction} machine_catalog={machineCatalog}/>)
+                                allBookingDates={this.state.allBookingDates}
+                                returnHomeInformUser={this.returnHomeInformUser}
+                                updateCatalogMachine={this.updateCatalogMachine}
+                            />
+                            :(
+                                action==='new_machine'
+                                ?<Addmachine 
+                                titleColor={titleColor}
+                                dealerColor={dealerColor}
+                                dealerBackgroundColor={dealerBackgroundColor}
+                                returnHomeInformUser={this.returnHomeInformUser}>
+                                </Addmachine>
+                                :(
+                                    action==='bookinglist'
+                                    ?<Bookinglist 
+                                    titleColor={titleColor}
+                                    dealerColor={dealerColor}
+                                    dealerBackgroundColor={dealerBackgroundColor}
+                                    machine={this.state.machine}
+                                    updateCatalogMachine={this.updateCatalogMachine}
+                                    returnHomeInformUser={this.returnHomeInformUser}>
+                                    </Bookinglist>
+                                    :
+                                    <Machinegridlist handleMachineAction={this.handleMachineAction} machine_catalog={machineCatalog}/>
+                                )
+                            )
                         }
                     </Container>
+                    <Snackbar
+                        anchorOrigin={{
+                        vertical: 'top',
+                        horizontal: 'center',
+                        }}
+                        open={this.state.messageSnackbarIsOpen}
+                        autoHideDuration={4000}
+                        onClose={this.snackBarHandleClose}
+                        message={this.state.snackbarMessage&&this.state.snackbarMessage}
+                        action={
+                        <React.Fragment>
+                            <IconButton size="small" aria-label="close" color="inherit" onClick={this.snackBarHandleClose}>
+                            <CloseIcon fontSize="small" />
+                            </IconButton>
+                        </React.Fragment>
+                        }
+                    />
                 </ThemeProvider>
             </div>
             

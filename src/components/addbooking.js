@@ -92,7 +92,7 @@ function getStepContent(step) {
   }
 }
 
-export default function Booking({machine,dealer,setContractToState,allBookingDates,Customers_catalog}) {
+export default function Booking({machine,dealer,setContractToState,allBookingDates,Customers_catalog,returnHomeInformUser,updateCatalogMachine}) {
   const classes = useStyles();
   const [activeStep, setActiveStep] = React.useState(0);
   const [firstSelectedDate, setFirstSelectedDate] = React.useState(null);
@@ -100,7 +100,8 @@ export default function Booking({machine,dealer,setContractToState,allBookingDat
   const [tempBookingDates,setTempBookingDates] = React.useState([]);
   const [duration,setDuration] = React.useState();
   const [focusedInput, setFocusedInput] = React.useState(null);
-  const [searchInput,setSearchInput] = React.useState('')
+  const [searchInput,setSearchInput] = React.useState('');
+  const [loading,setLoading] = React.useState(false);
   const [name, setName] = React.useState('');
   const [customerSuggestionList,setCustomerSuggestionList]=React.useState(null);
   const [customerOnContract,setCustomerOnContract] = React.useState({});
@@ -176,28 +177,29 @@ export default function Booking({machine,dealer,setContractToState,allBookingDat
       const bookingFormatedToJson = customerOnContract;
       bookingFormatedToJson.bookingDates=tempBookingDates;
       bookingFormatedToJson.status=bookingType;
-      bookingFormatedToJson.id=machine.id;
+      bookingFormatedToJson.idMachine=machine.id;
+      console.log('bookingFormatedToJson : ',bookingFormatedToJson.idMachine)
       setContractToState(bookingFormatedToJson);
 
       try{
+        setLoading(true);
         const axiosResponse = await Axios({
           method: "post",
           url: 'http://localhost:4001/post/addBooking',
           data:bookingFormatedToJson, //DATA PARAMETER = req.body IF JSON || form-data IF FORM
         });
-        console.log('axios response : ',axiosResponse);
+        const{data,status} = axiosResponse;
+        if(status==201){
+          returnHomeInformUser('Votre location vient d\'être sauvegardée','success');
+          updateCatalogMachine();
+        }
       }
       catch(error){
+        setLoading(false);
         console.log('error: ',error);
       }
-      
-
-      
     }
-
-    
-
-    };
+  };
 
   const handleBack = () => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
@@ -208,32 +210,35 @@ export default function Booking({machine,dealer,setContractToState,allBookingDat
   };
 
   const searchChange = async(event) => {
+    
     let customerName = event.target.value;
     setSearchInput(customerName);
     
-      if(Customers_catalog&&customerName.length>2){
-        let customerToSuggest = [];
-        Customers_catalog.forEach(element => {
-          if(element.name){
-            if(element.name.includes(customerName.toUpperCase())){
-              customerToSuggest=[...customerToSuggest,element];
-            }
-          } 
-        })
-        setCustomerSuggestionList(customerToSuggest);
+    if(Customers_catalog&&customerName.length>2){
+      let customerToSuggest = [];
+      Customers_catalog.forEach(element => {
+
+        if(element.name){
+          if(element.name.includes(customerName.toUpperCase())){
+            customerToSuggest=[...customerToSuggest,element];
+          }
+        } 
+
+      })
+
+      setCustomerSuggestionList(customerToSuggest);
 
       }else{
+
         setCustomerSuggestionList([]);
-      }
-      
+
+      } 
   }
 
   const handleClose = (event, reason) => {
-    if (reason === 'clickaway') {
-      return;
-    }
 
     setAlertSnackbarOpen(false);
+
   };
   
   return (
@@ -356,11 +361,13 @@ export default function Booking({machine,dealer,setContractToState,allBookingDat
                     <FormLabel component="legend">Vous enregistrez un :</FormLabel>
                       <RadioGroup className={classes.radio} aria-label="bookingType" name="bookingType" value={bookingType} onChange={(e)=>setBookingType(e.target.value)}>
                         <FormControlLabel
+                          disabled={loading}
                           value="contract"
                           control={<Radio />}
                           label="contrat" 
                           />
                           <FormControlLabel
+                          disabled={loading}
                           value="estimate"
                           control={<Radio />}
                           label="devis" 
@@ -383,11 +390,13 @@ export default function Booking({machine,dealer,setContractToState,allBookingDat
                   <FormLabel component="legend">Location à</FormLabel>
                   <RadioGroup className={classes.radio} aria-label="rentalUnit" name="rentalUnit" value={unitChoice} onChange={(e)=>setUnitChoice(e.target.value)}>
                     <FormControlLabel
+                      disabled={loading}
                       value="day"
                       control={<Radio />}
                       label="la journée" 
                       />
                       <FormControlLabel
+                      disabled={loading}
                       value="hour"
                       control={<Radio />}
                       label="l'heure" 
@@ -396,6 +405,7 @@ export default function Booking({machine,dealer,setContractToState,allBookingDat
                     <FormControl fullWidth style={{marginTop:'20px'}}>
                       <InputLabel htmlFor="unitPrice">Prix unitaire</InputLabel>
                       <Input
+                        disabled={loading}
                         id="unitPrice"
                         autoFocus
                         value={values.unitPrice}
@@ -406,6 +416,7 @@ export default function Booking({machine,dealer,setContractToState,allBookingDat
                     <FormControl fullWidth style={{marginTop:'20px'}}>
                       <InputLabel htmlFor="unitNumber">Quantité</InputLabel>
                         <Input
+                          disabled={loading}
                           id="unitNumber"
                           defaultValue={duration}
                           //value={values.unitNumber}

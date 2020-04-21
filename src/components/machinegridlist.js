@@ -50,7 +50,7 @@ export default function Machinegridlist({handleMachineAction,machine_catalog}) {
                   <IconButton aria-label={`Informations sur ${machine.type.toUpperCase()}`} className={classes.icon}  onClick={()=>handleMachineAction(machine,'calendar')}>
                     <DateRangeIcon/>
                   </IconButton>
-                  <IconButton aria-label={`Informations sur ${machine.type.toUpperCase()}`} className={classes.icon}  onClick={()=>handleMachineAction(machine,'calendar')}>
+                  <IconButton aria-label={`Informations sur ${machine.type.toUpperCase()}`} className={classes.icon}  onClick={()=>handleMachineAction(machine,'bookinglist')}>
                     <DescriptionIcon/>
                   </IconButton>
                   <IconButton aria-label={`Informations sur ${machine.type.toUpperCase()}`} className={classes.icon}  onClick={()=>handleMachineAction(machine,'booking')}>

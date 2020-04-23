@@ -1,4 +1,5 @@
 import React,{Component} from 'react';
+import Moment from 'moment';
 
 import Addbooking from './components/addbooking.js';
 import Addmachine from './components/addmachine.js';
@@ -24,7 +25,7 @@ import 'moment/locale/fr';
 class Mainview extends Component{
     constructor(props){
         super(props)
-        this.state={action:'home',messageSnackbarIsOpen:false}
+        this.state={action:'home',messageSnackbarIsOpen:false,titleColor : '#515150'}
         
     }
 
@@ -39,8 +40,9 @@ class Mainview extends Component{
     });
 
     handleMachineAction = (machine,action)=>{
-        /**SET THE STATE : MACHINE = MACHINE PARAMETERS FROM CATALOG, ACTION = PAGE TO SET, ALLBOOKINGDATES = MERGING ALL THE DAY BOOKED FOR THE MACHINE */
+        /**CREATE AN ARRAY OF ALLBOOKINGDATES TO SET THE DATEPICKER */
         let allBookingDates = [];
+
         if(machine.booking){
             machine.booking.filter(
                 element=>element.status==='contract'
@@ -48,7 +50,15 @@ class Mainview extends Component{
                 element => {
                 allBookingDates = [...allBookingDates,...element.bookingDates];
             });
+        
+        /**ADD THE firstBookingDate TO EACH BOOKING IN A MOMENT FORMAT TO SORT THE BOOKINGS */
+            machine.booking.forEach(
+                element=>{
+                element.firstBookingDate = Moment(element.bookingDates[0]).add(1, 'M');
+            })
         }
+
+
         this.setState({machine:machine,action:action,allBookingDates:allBookingDates})
     }
 
@@ -60,7 +70,13 @@ class Mainview extends Component{
         this.setState({'contract':contract});
         //const datefromBookingDates = bookingDates.map((element)=>((element)));
     }
-    setNavigationHeader=(dealerColor,dealerBackgroundColor,titleColor)=>{
+
+    /**RTF : MERGE IT WITH handlemachineaction */
+    setActionState = (value)=>{
+        this.setState({action:value});
+    }
+
+    setNavigationHeader=(titleColor)=>{
         const action = this.state.action
         let icon='';
         let title = '';
@@ -74,7 +90,7 @@ class Mainview extends Component{
                 icon = 'arrow_back';
                 title = 'retour';
         }
-
+        console.log('titleColor : ',titleColor);
         return(
             <div className='marginTopBottom30'>
                 <div>
@@ -83,24 +99,10 @@ class Mainview extends Component{
                     </IconButton>
                 </div> 
                 <div>
-                    <Typography variant="h6" style={{color:titleColor,marginLeft:'15px'}}>
+                    <Typography variant="h6" style={{color:this.state.titleColor,marginLeft:'15px'}}>
                     {title.toUpperCase()}
                     </Typography>
                 </div>
-                {
-                this.state.action==='home'
-                &&
-                    <div style={{textAlign:'right'}}>
-                        <Button
-                            variant="contained"
-                            onClick={()=>this.setState({action:'new_machine'})}
-                            style={{color:dealerColor,backgroundColor:dealerBackgroundColor}}
-                            startIcon={<AddCircleOutlineIcon />}
-                        >
-                            Ajouter une machine
-                        </Button>
-                    </div>
-                }
                 
             </div>
         )
@@ -152,13 +154,14 @@ class Mainview extends Component{
         const customersCatalog = this.state.Customers_catalog;
         const dealerColor = this.state.dealer&&this.state.dealer.color;
         const dealerBackgroundColor = this.state.dealer&&this.state.dealer.backgroundColor;
-        const titleColor = '#515150';
+
 
         return(
             
             <div>
                 <ThemeProvider theme={this.theme}>
                     <ButtonAppBar 
+                        setActionState={this.setActionState}
                         color={dealer&&dealer.color?dealer.color:'grey'} 
                         backgroundColor={dealer&&dealer.backgroundColor?dealer.backgroundColor:'#E4B363'} 
                         title={dealer&&dealer.name?dealer.name:'AGRILOCATION'}
@@ -167,7 +170,7 @@ class Mainview extends Component{
                     <Container>
                         
                         {
-                            this.setNavigationHeader(dealerColor,dealerBackgroundColor,titleColor)
+                            this.setNavigationHeader(dealerColor,dealerBackgroundColor,this.state.titleColor)
                         }
                         {
                             action==='booking'
@@ -183,15 +186,16 @@ class Mainview extends Component{
                             :(
                                 action==='new_machine'
                                 ?<Addmachine 
-                                titleColor={titleColor}
+                                titleColor={this.state.titleColor}
                                 dealerColor={dealerColor}
                                 dealerBackgroundColor={dealerBackgroundColor}
-                                returnHomeInformUser={this.returnHomeInformUser}>
+                                returnHomeInformUser={this.returnHomeInformUser}
+                                updateCatalogMachine={this.updateCatalogMachine}>
                                 </Addmachine>
                                 :(
                                     action==='bookinglist'
                                     ?<Bookinglist 
-                                    titleColor={titleColor}
+                                    titleColor={this.state.titleColor}
                                     dealerColor={dealerColor}
                                     dealerBackgroundColor={dealerBackgroundColor}
                                     machine={this.state.machine}
@@ -199,7 +203,14 @@ class Mainview extends Component{
                                     returnHomeInformUser={this.returnHomeInformUser}>
                                     </Bookinglist>
                                     :
-                                    <Machinegridlist handleMachineAction={this.handleMachineAction} machine_catalog={machineCatalog}/>
+                                    <Machinegridlist
+                                        titleColor={this.state.titleColor}
+                                        dealerColor={dealerColor}
+                                        dealerBackgroundColor={dealerBackgroundColor}
+                                        handleMachineAction={this.handleMachineAction}
+                                        machine_catalog={machineCatalog}
+                                        setActionState={this.setActionState}
+                                    />
                                 )
                             )
                         }

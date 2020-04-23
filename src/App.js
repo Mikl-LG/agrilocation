@@ -1,6 +1,6 @@
 import React from 'react';
 import './App.css';
-import Mainview from './Mainview.js'
+import Mainview from './Mainview'
 
 function App() {
 

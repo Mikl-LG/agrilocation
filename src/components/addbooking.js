@@ -175,9 +175,12 @@ export default function Booking({machine,dealer,setContractToState,allBookingDat
       }
     }else if(activeStep===2){
       const bookingFormatedToJson = customerOnContract;
-      bookingFormatedToJson.bookingDates=tempBookingDates;
-      bookingFormatedToJson.status=bookingType;
-      bookingFormatedToJson.idMachine=machine.id;
+      bookingFormatedToJson.bookingDates = tempBookingDates;
+      bookingFormatedToJson.status = bookingType;
+      bookingFormatedToJson.idMachine = machine.id;
+      bookingFormatedToJson.unitChoice = unitChoice;
+      bookingFormatedToJson.unitPrice = values.unitPrice;
+      bookingFormatedToJson.unitNumber = values.unitNumber;
       console.log('bookingFormatedToJson : ',bookingFormatedToJson.idMachine)
       setContractToState(bookingFormatedToJson);
 
@@ -251,7 +254,7 @@ export default function Booking({machine,dealer,setContractToState,allBookingDat
             <p><b>{machine.nature.toUpperCase()+' '+machine.brand.toUpperCase()+' '+machine.type.toUpperCase()}</b></p>
             <p>{machine.options}</p>
             <p style={{textAlign:'left'}}><b>Prix à la journée : </b>{machine.day_price}€</p>
-            <p style={{textAlign:'left'}}><b>Prix à l'heure : </b>{machine.hour_price}€</p>
+            <p style={{textAlign:'left'}}><b>Prix à {machine.unit_label} : </b>{machine.unit_price}€</p>
           </Paper>
         </Grid>
         <Grid item xs={12} lg={8}>
@@ -387,19 +390,19 @@ export default function Booking({machine,dealer,setContractToState,allBookingDat
 
                   <div>
                   <FormGroup>
-                  <FormLabel component="legend">Location à</FormLabel>
+                  <FormLabel component="legend">Location par :</FormLabel>
                   <RadioGroup className={classes.radio} aria-label="rentalUnit" name="rentalUnit" value={unitChoice} onChange={(e)=>setUnitChoice(e.target.value)}>
                     <FormControlLabel
                       disabled={loading}
                       value="day"
                       control={<Radio />}
-                      label="la journée" 
+                      label="jour" 
                       />
                       <FormControlLabel
                       disabled={loading}
-                      value="hour"
+                      value={machine.unit_label}
                       control={<Radio />}
-                      label="l'heure" 
+                      label={machine.unit_label} 
                       />
                   </RadioGroup>
                     <FormControl fullWidth style={{marginTop:'20px'}}>
@@ -418,8 +421,7 @@ export default function Booking({machine,dealer,setContractToState,allBookingDat
                         <Input
                           disabled={loading}
                           id="unitNumber"
-                          defaultValue={duration}
-                          //value={values.unitNumber}
+                          value={values.unitNumber}
                           onChange={handleChange('unitNumber')}
                         />
                     </FormControl>

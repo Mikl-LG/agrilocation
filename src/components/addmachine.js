@@ -63,7 +63,7 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-export default function Addmachine({titleColor,dealerColor,dealerBackgroundColor,returnHomeInformUser}) {
+export default function Addmachine({titleColor,dealerColor,dealerBackgroundColor,returnHomeInformUser,updateCatalogMachine}) {
   const classes = useStyles();
   const [machine, setMachine] = React.useState({});
   const [loading,setLoading] = React.useState(false);
@@ -77,7 +77,7 @@ export default function Addmachine({titleColor,dealerColor,dealerBackgroundColor
   const createMachine = async() => {
 
     /** CHECK IF ALL THE FIELDS ARE COMPLETE */
-    if(machine.brand === undefined || machine.brand === '' || machine.nature === undefined || machine.nature === '' ||machine.type === undefined || machine.type === '' || machine.day_price === undefined || machine.day_price === '' || machine.hour_price === undefined || machine.hour_price === ''){
+    if(machine.brand === undefined || machine.brand === '' || machine.nature === undefined || machine.nature === '' ||machine.type === undefined || machine.type === '' || machine.day_price === undefined || machine.day_price === '' || machine.unit_price === undefined || machine.unit_price === '' || machine.unit_label === undefined || machine.unit_label === ''){
 
     setAlertSnackbarMessage('Encore un effort : il semble qu\'au moins un champ ne soit pas complété');
     setAlertSnackbarIsOpen(true);
@@ -103,7 +103,8 @@ export default function Addmachine({titleColor,dealerColor,dealerBackgroundColor
             machineForm.append('nature',machine.nature);
             machineForm.append('options',machine.options);
             machineForm.append('day_price',machine.day_price);
-            machineForm.append('hour_price',machine.hour_price);
+            machineForm.append('unit_price',machine.unit_price);
+            machineForm.append('unit_label',machine.unit_label);
             machineForm.append('booking',[]);
             
             resolve(machineForm);
@@ -125,7 +126,10 @@ export default function Addmachine({titleColor,dealerColor,dealerBackgroundColor
         const {data, status} = axiosResponse;
                 
         //console.log('s3 uploaded image url : ', imageurl || 'no url received');
-        status === 201 && returnHomeInformUser('Votre machine est prête à être louée','success')
+        if(status === 201){
+          returnHomeInformUser('Votre machine est prête à être louée','success')
+          updateCatalogMachine();
+        }
       } catch(e) {
 
         console.log('addMachine error', e || 'null')
@@ -149,67 +153,77 @@ export default function Addmachine({titleColor,dealerColor,dealerBackgroundColor
       <form className={classes.root}>
         <Grid item xs={12} lg={4} className={classes.gridItem}>
           <TextField
-                className={classes.textfield}
-                disabled={loading}
-                id="outlined-name"
-                label="Nature"
-                placeholder='Tracteur, presse...'
-                value={machine&&machine.nature&&machine.nature}
-                onChange={(event)=>handleChange(event,'nature')}
-                variant="outlined"
-              />
-              <TextField
-                className={classes.textfield}
-                disabled={loading}
-                id="outlined-name"
-                label="Marque"
-                placeholder='Marque'
-                value={machine&&machine.brand&&machine.brand}
-                onChange={(event)=>handleChange(event,'brand')}
-                variant="outlined"
-              />
-              <TextField
-                className={classes.textfield}
-                disabled={loading}
-                id="outlined-name"
-                label="Modèle"
-                placeholder='Modèle'
-                value={machine&&machine.type&&machine.type}
-                onChange={(event)=>handleChange(event,'type')}
-                variant="outlined"
-              />
+            className={classes.textfield}
+            disabled={loading}
+            id="outlined-name"
+            label="Nature"
+            placeholder='Tracteur, presse...'
+            value={machine&&machine.nature&&machine.nature}
+            onChange={(event)=>handleChange(event,'nature')}
+            variant="outlined"
+          />
+          <TextField
+            className={classes.textfield}
+            disabled={loading}
+            id="outlined-name"
+            label="Marque"
+            placeholder='Marque'
+            value={machine&&machine.brand&&machine.brand}
+            onChange={(event)=>handleChange(event,'brand')}
+            variant="outlined"
+          />
+          <TextField
+            className={classes.textfield}
+            disabled={loading}
+            id="outlined-name"
+            label="Modèle"
+            placeholder='Modèle'
+            value={machine&&machine.type&&machine.type}
+            onChange={(event)=>handleChange(event,'type')}
+            variant="outlined"
+          />
+          <TextField
+            className={classes.textfield}
+            disabled={loading}
+            id="outlined-name"
+            label="Options"
+            placeholder='Relevage avant, chargeur, autoguidage...'
+            value={machine&&machine.options&&machine.options}
+            onChange={(event)=>handleChange(event,'options')}
+            variant="outlined"
+          />
         </Grid>
         <Grid item xs={12} lg={4} className={classes.gridItem}>
           <TextField
-                className={classes.textfield}
-                disabled={loading}
-                id="outlined-name"
-                label="Options"
-                placeholder='Relevage avant, chargeur, autoguidage...'
-                value={machine&&machine.options&&machine.options}
-                onChange={(event)=>handleChange(event,'options')}
-                variant="outlined"
-              />
-              <TextField
-                className={classes.textfield}
-                disabled={loading}
-                id="outlined-name"
-                label="Prix à l'heure"
-                placeholder='Tarif horaire de votre machine'
-                value={machine&&machine.hour_price&&machine.hour_price}
-                onChange={(event)=>handleChange(event,'hour_price')}
-                variant="outlined"
-              />
-              <TextField
-                className={classes.textfield}
-                disabled={loading}
-                id="outlined-name"
-                label="Prix à la journée"
-                placeholder='Tarif journalier de votre machine'
-                value={machine&&machine.day_price&&machine.day_price}
-                onChange={(event)=>handleChange(event,'day_price')}
-                variant="outlined"
-              />
+            className={classes.textfield}
+            disabled={loading}
+            id="outlined-name"
+            label="Prix à la journée"
+            placeholder='Tarif journalier de votre machine'
+            value={machine&&machine.day_price&&machine.day_price}
+            onChange={(event)=>handleChange(event,'day_price')}
+            variant="outlined"
+          />
+          <TextField
+            className={classes.textfield}
+            disabled={loading}
+            id="outlined-name"
+            label="Prix à l'unité"
+            placeholder='Tarif unitaire de votre machine'
+            value={machine&&machine.unit_price&&machine.unit_price}
+            onChange={(event)=>handleChange(event,'unit_price')}
+            variant="outlined"
+          />
+          <TextField
+            className={classes.textfield}
+            disabled={loading}
+            id="outlined-name"
+            label="Libellé unitaire"
+            placeholder="heure(s), botte(s)..."
+            value={machine&&machine.unit_label&&machine.unit_label}
+            onChange={(event)=>handleChange(event,'unit_label')}
+            variant="outlined"
+          />
         </Grid>
         <Grid item xs={12} lg={4} className={classes.gridItem} style={{alignSelf:'center'}}>
           <Dropzone disabled={loading} onDrop={acceptedFiles => setMachine({...machine,image:acceptedFiles})}>

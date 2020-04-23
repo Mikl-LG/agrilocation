@@ -5,6 +5,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import Checkbox from '@material-ui/core/Checkbox';
 import DateRangeIcon from '@material-ui/icons/DateRange';
+import DeleteIcon from '@material-ui/icons/Delete';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
@@ -36,6 +37,8 @@ import Select from '@material-ui/core/Select';
 import StopIcon from '@material-ui/icons/Stop';
 import Switch from '@material-ui/core/Switch';
 import Typography from '@material-ui/core/Typography';
+
+import Axios from 'axios';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -75,7 +78,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function Bookinglist({titleColor,dealerColor,dealerBackgroundColor,machine,updateCatalogMachine}) {
+export default function Bookinglist({titleColor,dealerColor,dealerBackgroundColor,machine,updateCatalogMachine,returnHomeInformUser}) {
   const classes = useStyles();
   const [checked, setChecked] = React.useState([0]);
   const [open, setOpen] = React.useState(false);
@@ -99,6 +102,23 @@ export default function Bookinglist({titleColor,dealerColor,dealerBackgroundColo
   const dialogInfoOpen = (value) => {
     setOpen(value);
   };
+
+  const deleteBooking = async(booking)=>{
+    
+    const axiosResponse = await Axios({
+      method: "post",
+      url: 'http://localhost:4001/post/deleteBooking',
+      data:booking,
+      //config: { headers: { "Content-Type": "multipart/form-data" } }
+    });
+
+    const{status,data} = axiosResponse;
+    if(status === 201){
+      returnHomeInformUser('Votre réservation vient d\'être supprimée','success');
+      updateCatalogMachine();
+    }
+
+  }
 
   const longformatDate = ()=>{
     
@@ -152,9 +172,7 @@ export default function Bookinglist({titleColor,dealerColor,dealerBackgroundColo
           </FormControl>
           <List className={classes.root}>
             {machine.booking
-            ?machine.booking.filter(
-              element=>element.status==='contract'
-            ).sort(function(a,b){
+            ?machine.booking.sort(function(a,b){
               return a.firstBookingDate - b.firstBookingDate;
             }).map(
               (value,index) => {
@@ -238,10 +256,13 @@ export default function Bookinglist({titleColor,dealerColor,dealerBackgroundColo
             
           </DialogContent>
           <DialogActions>
-            <IconButton edge="end" aria-label="comments" onClick={()=>alert('Vers édition')}>
+            <IconButton edge="end" aria-label="delete" onClick={()=>deleteBooking(currentBooking)}>
+              <DeleteIcon />
+            </IconButton>
+            <IconButton edge="end" aria-label="edit" onClick={()=>alert('Vers édition')}>
               <EditIcon />
             </IconButton>
-            <IconButton edge="start" aria-label="comments" onClick={()=>alert('vers PDF')}>
+            <IconButton edge="start" aria-label="print" onClick={()=>alert('vers PDF')}>
               <PictureAsPdfIcon />
             </IconButton>
             <IconButton edge="end" color="primary" onClick={()=>dialogInfoOpen(false)} >

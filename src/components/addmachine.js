@@ -158,7 +158,7 @@ export default function Addmachine({titleColor,dealerColor,dealerBackgroundColor
             id="outlined-name"
             label="Nature"
             placeholder='Tracteur, presse...'
-            value={machine&&machine.nature&&machine.nature}
+            //value={machine&&machine.nature&&machine.nature}
             onChange={(event)=>handleChange(event,'nature')}
             variant="outlined"
           />
@@ -168,7 +168,7 @@ export default function Addmachine({titleColor,dealerColor,dealerBackgroundColor
             id="outlined-name"
             label="Marque"
             placeholder='Marque'
-            value={machine&&machine.brand&&machine.brand}
+            //value={machine&&machine.brand&&machine.brand}
             onChange={(event)=>handleChange(event,'brand')}
             variant="outlined"
           />
@@ -178,7 +178,7 @@ export default function Addmachine({titleColor,dealerColor,dealerBackgroundColor
             id="outlined-name"
             label="Modèle"
             placeholder='Modèle'
-            value={machine&&machine.type&&machine.type}
+            //value={machine&&machine.type&&machine.type}
             onChange={(event)=>handleChange(event,'type')}
             variant="outlined"
           />
@@ -188,7 +188,7 @@ export default function Addmachine({titleColor,dealerColor,dealerBackgroundColor
             id="outlined-name"
             label="Options"
             placeholder='Relevage avant, chargeur, autoguidage...'
-            value={machine&&machine.options&&machine.options}
+            //value={machine&&machine.options&&machine.options}
             onChange={(event)=>handleChange(event,'options')}
             variant="outlined"
           />
@@ -200,7 +200,7 @@ export default function Addmachine({titleColor,dealerColor,dealerBackgroundColor
             id="outlined-name"
             label="Prix à la journée"
             placeholder='Tarif journalier de votre machine'
-            value={machine&&machine.day_price&&machine.day_price}
+            //value={machine&&machine.day_price&&machine.day_price}
             onChange={(event)=>handleChange(event,'day_price')}
             variant="outlined"
           />
@@ -210,7 +210,7 @@ export default function Addmachine({titleColor,dealerColor,dealerBackgroundColor
             id="outlined-name"
             label="Prix à l'unité"
             placeholder='Tarif unitaire de votre machine'
-            value={machine&&machine.unit_price&&machine.unit_price}
+            //value={machine&&machine.unit_price&&machine.unit_price}
             onChange={(event)=>handleChange(event,'unit_price')}
             variant="outlined"
           />
@@ -220,10 +220,10 @@ export default function Addmachine({titleColor,dealerColor,dealerBackgroundColor
             id="outlined-name"
             label="Libellé unitaire"
             placeholder="heure(s), botte(s)..."
-            value={machine&&machine.unit_label&&machine.unit_label}
+            //value={machine&&machine.unit_label&&machine.unit_label}
             onChange={(event)=>handleChange(event,'unit_label')}
-            variant="outlined"
-          />
+              variant="outlined"
+            />
         </Grid>
         <Grid item xs={12} lg={4} className={classes.gridItem} style={{alignSelf:'center'}}>
           <Dropzone disabled={loading} onDrop={acceptedFiles => setMachine({...machine,image:acceptedFiles})}>

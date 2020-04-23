@@ -226,7 +226,6 @@ export default function Booking({machine,dealer,setContractToState,allBookingDat
             customerToSuggest=[...customerToSuggest,element];
           }
         } 
-
       })
 
       setCustomerSuggestionList(customerToSuggest);

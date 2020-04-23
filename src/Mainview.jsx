@@ -210,6 +210,8 @@ class Mainview extends Component{
                                         handleMachineAction={this.handleMachineAction}
                                         machine_catalog={machineCatalog}
                                         setActionState={this.setActionState}
+                                        returnHomeInformUser={this.returnHomeInformUser}
+                                        updateCatalogMachine={this.updateCatalogMachine}
                                     />
                                 )
                             )

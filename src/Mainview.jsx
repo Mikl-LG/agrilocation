@@ -195,12 +195,11 @@ class Mainview extends Component{
                                 :(
                                     action==='bookinglist'
                                     ?<Bookinglist 
-                                    titleColor={this.state.titleColor}
-                                    dealerColor={dealerColor}
-                                    dealerBackgroundColor={dealerBackgroundColor}
                                     machine={this.state.machine}
                                     updateCatalogMachine={this.updateCatalogMachine}
-                                    returnHomeInformUser={this.returnHomeInformUser}>
+                                    returnHomeInformUser={this.returnHomeInformUser}
+
+                                    >
                                     </Bookinglist>
                                     :
                                     <Machinegridlist

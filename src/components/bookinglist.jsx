@@ -3,7 +3,8 @@ import 'typeface-roboto';
 
 import { makeStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
-import Checkbox from '@material-ui/core/Checkbox';
+import CreateIcon from '@material-ui/icons/Create';
+import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import DateRangeIcon from '@material-ui/icons/DateRange';
 import DeleteIcon from '@material-ui/icons/Delete';
 import Dialog from '@material-ui/core/Dialog';
@@ -39,6 +40,7 @@ import Switch from '@material-ui/core/Switch';
 import Typography from '@material-ui/core/Typography';
 
 import Axios from 'axios';
+import { useEffect } from 'react';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -50,6 +52,10 @@ const useStyles = makeStyles((theme) => ({
     overflow: 'hidden',
     backgroundColor: theme.palette.background.paper,
     color: theme.palette.text.secondary,
+  },
+  bookingTopBar:{
+    display:'flex',
+    justifyContent:'flex-end'
   },
   gridList: {
     width: '100%',
@@ -78,26 +84,13 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function Bookinglist({titleColor,dealerColor,dealerBackgroundColor,machine,updateCatalogMachine,returnHomeInformUser}) {
+export default function Bookinglist({machine,updateCatalogMachine,returnHomeInformUser}) {
   const classes = useStyles();
   const [checked, setChecked] = React.useState([0]);
   const [open, setOpen] = React.useState(false);
   const [currentBooking,setCurrentBooking] = React.useState({});
+  const [bookingStatus,setBookingStatus] = React.useState('contract');
   Moment.locale('fr');
-
-  const addBookingToSelectedList = (value) => () => {
-    const currentIndex = checked.indexOf(value);
-    const newChecked = [...checked];
-
-    if (currentIndex === -1) {
-      newChecked.push(value);
-    } else {
-      newChecked.splice(currentIndex, 1);
-    }
-
-    setChecked(newChecked);
-    console.log('checked : ',checked);
-  };
 
   const dialogInfoOpen = (value) => {
     setOpen(value);
@@ -153,57 +146,69 @@ export default function Bookinglist({titleColor,dealerColor,dealerBackgroundColo
           </Paper>
         </Grid>
         <Grid item xs={12} lg={8}>
-          <Typography variant='h6'>Liste des réservations</Typography>
-          <FormControl>
-            <RadioGroup row aria-label="booking-status" name="booking-status" defaultValue="top">
-              <FormControlLabel
-                value="contract"
-                control={<Radio color="primary" />}
-                label="Contrats"
-                labelPlacement="top"
-              />
-              <FormControlLabel
-                value="estimate"
-                control={<Radio color="primary" />}
-                label="Devis" 
-                labelPlacement="top"
-              />
-            </RadioGroup>
-          </FormControl>
+          <div className={classes.bookingTopBar}>
+              <FormControl>
+                <RadioGroup row aria-label="booking-status" value={bookingStatus} name="booking-status" defaultValue="top" onChange={(e)=>setBookingStatus(e.target.value)}>
+                  <FormControlLabel
+                    defaultChecked
+                    value="contract"
+                    control={<Radio color="primary" />}
+                    label="Contrats"
+                    labelPlacement="left"
+                  />
+                  <FormControlLabel
+                    value="estimate"
+                    control={<Radio color="primary" />}
+                    label="Devis" 
+                    labelPlacement="left"
+                  />
+                </RadioGroup>
+              </FormControl>
+          </div>
+          <Divider/>
           <List className={classes.root}>
             {machine.booking
-            ?machine.booking.sort(function(a,b){
+            ?machine.booking.filter((booking)=>booking.status == bookingStatus).filter((booking)=>booking.firstBookingDate.isAfter()).sort(function(a,b){
               return a.firstBookingDate - b.firstBookingDate;
             }).map(
               (value,index) => {
                 const labelId = `checkbox-list-label-${value.id}`;
+                  return (
+                    <ListItem
+                      key={value.bookingDates}
+                      role={undefined} dense divider button
+                      onClick={()=>{
+                        setCurrentBooking(value);
+                        dialogInfoOpen(true);}}
+                      style={{color:'A5FFD6'}}>
+                      <ListItemIcon>
+                        {
+                          value.status === 'contract'
+                          ?
+                          <CheckCircleIcon
+                          edge="start"
+                          color='primary'
+                          />
+                          :
+                          <CreateIcon
+                            edge="start"
+                          />
+                        }
+                        
 
-                return (
-                  <ListItem
-                    key={value.bookingDates}
-                    role={undefined} dense divider button
-                    onClick={addBookingToSelectedList(value)}>
-                    <ListItemIcon>
-                      <Checkbox
-                        edge="start"
-                        checked={checked.indexOf(value) !== -1}
-                        tabIndex={-1}
-                        disableRipple
-                        inputProps={{ 'aria-labelledby': labelId }}
+                      </ListItemIcon>
+                      <ListItemText
+                        id={labelId}
+                        primary={`${value.title} ${value.name}`}
+                        secondary={`${value.postal} ${value.city}`}
                       />
-                    </ListItemIcon>
-                    <ListItemText id={labelId} primary={`${value.title} ${value.name}`} secondary={`${value.postal} ${value.city}`}/>
-                    <ListItemText style={{textAlign:'right',fontStyle:'italic'}} id={labelId} secondary={`${value.firstBookingDate.endOf('day').fromNow()}`}/>
-                    <ListItemSecondaryAction>
-                      <IconButton edge="end" aria-label="comments" onClick={()=>{
-                        //SET THE COMPLETE BOOKING IN THE HOOK
-                        setCurrentBooking(machine.booking[index]);
-                        dialogInfoOpen(true);}}>
-                        <InfoIcon color='primary'/>
-                      </IconButton>
-                    </ListItemSecondaryAction>
-                  </ListItem>
-              );
+                      <ListItemText
+                        style={{textAlign:'right',fontStyle:'italic'}}
+                        id={labelId}
+                        secondary={`${value.firstBookingDate.endOf('day').fromNow()}`}
+                      />
+                    </ListItem>
+                  );
             })
           :<p>Il n'y a aucun contrat pour ce matériel.</p>}
           </List>

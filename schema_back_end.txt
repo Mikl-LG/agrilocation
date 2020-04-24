@@ -1,25 +1,38 @@
-OBJECT CONTRACT
-//ID - integer
-//MACHINE_ID - integer
-//CUSTOMER_ID - integer
-//FIRST_DAY - date
-//LAST_DAY - date
-//ESTIMATE - boolean
-//DAY_PRICE - float
-//DAY_NUMBER - float
-//HOUR_PRICE - float
-//HOUR_NUMBER - float
+OBJECT BOOKING
+//ID - integer /**ID OF THE CUSTOMER
+//TITLE - string
+//NAME - string
+//FIRSTADDRESS - string
+//SECONDADDRESS - string
+//THIRDADDRESS - string
+//POSTAL - string
+//CITY - string
+//CELLPHONE - string
+//PHONE - string
+//EMAIL - string
+//SIREN - string
+//IDMACHINE - UUID
+//BOOKINGDATES - [] /**ARRAY OF DATES YYYY - MM - DD
+//FIRSTBOOKINGDATE - MOMENT
+//STATUS - string /**CONTRACT OR ESTIMATE
+//VISIBLE - boolean /**true - false
+//UNITPRICE - float
+//UNITNUMBER - float
+//UNITCHOICE - string
 
 
 OBJECT MACHINE
-//ID - integer
-//NATURE - varchar
-//BRAND - varchar
-//TYPE - varchar
+//BOOKING - []
+//ID - UUI
+//NATURE - string
+//BRAND - string
+//TYPE - string
 //OPTIONS - varchar
-//HORSEPOWER - integer
 //DAY_PRICE - float
-//HOUR_PRICE - float
+//UNIT_PRICE - float
+//UNIT_LABEL - string
+//VISIBLE - boolean /**true - false
+//IMAGE_URL - string
 
 
 OBJECT CUSTOMER

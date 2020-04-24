@@ -168,7 +168,7 @@ export default function Bookinglist({machine,updateCatalogMachine,returnHomeInfo
           <Divider/>
           <List className={classes.root}>
             {machine.booking
-            ?machine.booking.filter((booking)=>booking.status == bookingStatus).filter((booking)=>booking.firstBookingDate.isAfter()).sort(function(a,b){
+            ?machine.booking.filter((booking)=>booking.status === bookingStatus).filter((booking)=>booking.firstBookingDate.isAfter()).sort(function(a,b){
               return a.firstBookingDate - b.firstBookingDate;
             }).map(
               (value,index) => {

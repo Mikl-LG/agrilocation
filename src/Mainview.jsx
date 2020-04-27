@@ -205,7 +205,6 @@ class Mainview extends Component{
                                     </Bookinglist>
                                     :
                                     <Machinegridlist
-                                        titleColor={this.state.titleColor}
                                         dealerColor={dealerColor}
                                         dealerBackgroundColor={dealerBackgroundColor}
                                         handleMachineAction={this.handleMachineAction}

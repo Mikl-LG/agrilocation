@@ -1,10 +1,7 @@
 import jsPdf from 'jspdf';
 import dealerHeader from '../constants/dealerHeader.js';
-import Bookinglist from './bookinglist.jsx';
 
 const getBookingPdf = (booking,dealer,machine) => {
-    console.log('booking : ',booking);
-    console.log('machine : ',machine);
 
     const typeOfBooking = booking.status === 'contract' ? 'Contrat' : 'Devis';
     const unitChoice = booking.unitChoice ==='day' ? 'jour(s)' : booking.unitChoice
@@ -58,7 +55,7 @@ const getBookingPdf = (booking,dealer,machine) => {
     bookingPdf.text('Signature client',10,225);
     bookingPdf.text('Signature loueur',140,225);
 
-    bookingPdf.save(typeOfBooking+booking.name+'.pdf');
+    bookingPdf.save('agrilocation-document.pdf');
 }
 
 export default getBookingPdf;

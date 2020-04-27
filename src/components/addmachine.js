@@ -118,7 +118,7 @@ export default function Addmachine({titleColor,dealerColor,dealerBackgroundColor
 
         const axiosResponse = await Axios({
           method: "post",
-          url: 'http://localhost:4001/post/addMachineImage',
+          url: 'https://agrilocation.herokuapp.com/post/addMachineImage',
           data:machineInformations,
           config: { headers: { "Content-Type": "multipart/form-data" } }
         });

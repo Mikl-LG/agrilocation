@@ -55,6 +55,7 @@ class Mainview extends Component{
             machine.booking.forEach(
                 element=>{
                 element.firstBookingDate = Moment(element.bookingDates[0]).add(1, 'M');
+                element.lastBookingDate = Moment(element.bookingDates[element.bookingDates.length-1]).add(1, 'M');
             })
         }
 
@@ -121,7 +122,7 @@ class Mainview extends Component{
         try{
             const axiosResponse = await Axios({
               method: "get",
-              url: 'http://localhost:4001/get/machine'
+              url: 'https://agrilocation.herokuapp.com/get/machine'
             });
             
             const MACHINE_CATALOG = axiosResponse.data;
@@ -195,6 +196,7 @@ class Mainview extends Component{
                                 :(
                                     action==='bookinglist'
                                     ?<Bookinglist 
+                                    dealer={this.state.dealer}
                                     machine={this.state.machine}
                                     updateCatalogMachine={this.updateCatalogMachine}
                                     returnHomeInformUser={this.returnHomeInformUser}

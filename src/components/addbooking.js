@@ -123,7 +123,7 @@ export default function Booking({machine,dealer,setContractToState,allBookingDat
   const handleNext = async() => {
 
     if(activeStep===0){
-      if(firstSelectedDate&&lastSelectedDate){
+      if(firstSelectedDate){
         const newDatesToAdd = [];
         const duration = lastSelectedDate.diff(firstSelectedDate,'days')+1;
         setDuration(duration);
@@ -188,7 +188,7 @@ export default function Booking({machine,dealer,setContractToState,allBookingDat
         setLoading(true);
         const axiosResponse = await Axios({
           method: "post",
-          url: 'http://localhost:4001/post/addBooking',
+          url: 'https://agrilocation.herokuapp.com/post/addBooking',
           data:bookingFormatedToJson, //DATA PARAMETER = req.body IF JSON || form-data IF FORM
         });
         const{data,status} = axiosResponse;

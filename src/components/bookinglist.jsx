@@ -2,7 +2,6 @@ import React from 'react';
 import 'typeface-roboto';
 
 import { makeStyles } from '@material-ui/core/styles';
-import Button from '@material-ui/core/Button';
 import CreateIcon from '@material-ui/icons/Create';
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import DateRangeIcon from '@material-ui/icons/DateRange';
@@ -20,8 +19,6 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Grid from '@material-ui/core/Grid';
 import HighlightOffIcon from '@material-ui/icons/HighlightOff';
 import IconButton from '@material-ui/core/IconButton';
-import InfoIcon from '@material-ui/icons/Info';
-import InputLabel from '@material-ui/core/InputLabel';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
@@ -33,14 +30,11 @@ import PictureAsPdfIcon from '@material-ui/icons/PictureAsPdf';
 import PhoneIphoneIcon from '@material-ui/icons/PhoneIphone';
 import Radio from '@material-ui/core/Radio';
 import RadioGroup from '@material-ui/core/RadioGroup';
-import PlayArrowIcon from '@material-ui/icons/PlayArrow';
-import Select from '@material-ui/core/Select';
-import StopIcon from '@material-ui/icons/Stop';
-import Switch from '@material-ui/core/Switch';
 import Typography from '@material-ui/core/Typography';
 
 import Axios from 'axios';
-import { useEffect } from 'react';
+
+import getBookingPDF from './getBookingPdf.js';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -84,7 +78,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function Bookinglist({machine,updateCatalogMachine,returnHomeInformUser}) {
+export default function Bookinglist({dealer,machine,updateCatalogMachine,returnHomeInformUser}) {
   const classes = useStyles();
   const [checked, setChecked] = React.useState([0]);
   const [open, setOpen] = React.useState(false);
@@ -100,7 +94,7 @@ export default function Bookinglist({machine,updateCatalogMachine,returnHomeInfo
     
     const axiosResponse = await Axios({
       method: "post",
-      url: 'http://localhost:4001/post/deleteBooking',
+      url: 'https://agrilocation.herokuapp.com/post/deleteBooking',
       data:booking,
       //config: { headers: { "Content-Type": "multipart/form-data" } }
     });
@@ -267,7 +261,7 @@ export default function Bookinglist({machine,updateCatalogMachine,returnHomeInfo
             <IconButton edge="end" aria-label="edit" onClick={()=>alert('Vers édition')}>
               <EditIcon />
             </IconButton>
-            <IconButton edge="start" aria-label="print" onClick={()=>alert('vers PDF')}>
+            <IconButton edge="start" aria-label="print" onClick={()=>getBookingPDF(currentBooking,dealer,machine)}>
               <PictureAsPdfIcon />
             </IconButton>
             <IconButton edge="end" color="primary" onClick={()=>dialogInfoOpen(false)} >
